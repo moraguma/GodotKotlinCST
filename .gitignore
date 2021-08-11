@@ -1,0 +1,30 @@
+.gradle
+.DS_Store
+*.iml
+
+# Godot ignores
+.import
+*.translation
+export_presets.cfg
+.mono
+
+# IDE ignores
+/AndroidProject/.idea/caches
+/AndroidProject/.idea/libraries
+/AndroidProject/.idea/modules.xml
+/AndroidProject/.idea/workspace.xml
+/AndroidProject/.idea/navEditor.xml
+/AndroidProject/.idea/assetWizardSettings.xml
+
+/AndroidProject/local.properties
+/AndroidProject/captures
+/AndroidProject/.externalNativeBuild
+/AndroidProject/.cxx
+/AndroidProject/local.properties
+
+#binary build ignores
+/AndroidProject/godot-lib.3.3.2.stable.release/build
+/AndroidProject/app/build
+/AndroidProject/HelloWorld/build
+
+/GodotProject/PortCST/android/build
