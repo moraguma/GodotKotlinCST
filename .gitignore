@@ -27,4 +27,5 @@ export_presets.cfg
 /AndroidProject/app/build
 /AndroidProject/HelloWorld/build
 
-/GodotProject/PortCST/android/build
+/GodotProject/PortCST/android/build/*
+!/GodotProject/PortCST/android/build/build.gradle
