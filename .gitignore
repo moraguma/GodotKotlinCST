@@ -29,3 +29,6 @@ export_presets.cfg
 
 /GodotProject/PortCST/android/build/*
 !/GodotProject/PortCST/android/build/build.gradle
+
+/GodotProject/CSTVisualizer/android/build/*
+!/GodotProject/CSTVisualizer/android/build/build.gradle

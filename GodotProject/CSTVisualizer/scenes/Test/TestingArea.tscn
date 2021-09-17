@@ -1,0 +1,115 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://scripts/TestingArea.gd" type="Script" id=1]
+
+[sub_resource type="SpatialMaterial" id=6]
+albedo_color = Color( 0.921569, 0.2, 0.301961, 1 )
+
+[sub_resource type="SphereMesh" id=7]
+material = SubResource( 6 )
+radius = 0.25
+height = 0.25
+is_hemisphere = true
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 0.47451, 0.458824, 0.462745, 1 )
+
+[sub_resource type="CubeMesh" id=1]
+material = SubResource( 2 )
+size = Vector3( 3, 0.5, 2 )
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_color = Color( 0.270588, 0.168627, 0.168627, 1 )
+
+[sub_resource type="CubeMesh" id=4]
+material = SubResource( 3 )
+size = Vector3( 2.5, 0.1, 1.8 )
+
+[sub_resource type="CubeMesh" id=5]
+material = SubResource( 3 )
+size = Vector3( 0.2, 0.1, 0.5 )
+
+[node name="TestingArea" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="Projection" type="MeshInstance" parent="."]
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="Phone" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="Screen" type="MeshInstance" parent="Phone"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.116608, 0.213541, 0 )
+mesh = SubResource( 4 )
+material/0 = null
+
+[node name="Button" type="MeshInstance" parent="Phone"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.31672, 0.213541, 0 )
+mesh = SubResource( 5 )
+material/0 = null
+
+[node name="CameraPivot" type="Spatial" parent="."]
+
+[node name="Camera" type="Camera" parent="CameraPivot"]
+transform = Transform( -4.37114e-08, -0.397052, 0.917796, 0, 0.917796, 0.397052, -1, 1.73557e-08, -4.01181e-08, 15.9868, 9.77755, 0 )
+
+[node name="Left" type="Button" parent="."]
+margin_left = 8.0
+margin_top = 767.0
+margin_right = 196.0
+margin_bottom = 866.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Right" type="Button" parent="."]
+margin_left = 215.0
+margin_top = 767.0
+margin_right = 403.0
+margin_bottom = 866.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="X" type="Button" parent="."]
+margin_left = 9.0
+margin_top = 688.0
+margin_right = 130.0
+margin_bottom = 752.0
+text = "X"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Y" type="Button" parent="."]
+margin_left = 146.0
+margin_top = 688.0
+margin_right = 267.0
+margin_bottom = 752.0
+text = "Y"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Z" type="Button" parent="."]
+margin_left = 282.0
+margin_top = 688.0
+margin_right = 403.0
+margin_bottom = 752.0
+text = "Z"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="button_down" from="Left" to="." method="left_pressed_down"]
+[connection signal="button_up" from="Left" to="." method="left_pressed_up"]
+[connection signal="button_down" from="Right" to="." method="right_pressed_down"]
+[connection signal="button_up" from="Right" to="." method="right_pressed_up"]
+[connection signal="button_down" from="X" to="." method="x_pressed_down"]
+[connection signal="button_up" from="X" to="." method="x_pressed_up"]
+[connection signal="button_down" from="Y" to="." method="y_pressed_down"]
+[connection signal="button_up" from="Y" to="." method="y_pressed_up"]
+[connection signal="button_down" from="Z" to="." method="z_pressed_down"]
+[connection signal="button_up" from="Z" to="." method="z_pressed_up"]
