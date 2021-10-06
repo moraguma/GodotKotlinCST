@@ -1,10 +1,19 @@
 extends Node2D
 
-onready var VALUES = {"GRAVITY": $Control/Values/Gravity, "ACCELERATION": $Control/Values/Acceleration, "ROTATION": $Control/Values/Rotation, "VELOCITY": $Control/Values/Velocity}
+const MAX_NOTIFS = 100
+
+
+var total_notifs = 0
+
+onready var VALUES = {"POSITION": $Control/Values/Position, "VELOCITY": $Control/Values/Velocity, "BASIS": $Control/Values/Basis}
 onready var notification_label = $Control/Notification
 
 func create_notification(notification):
+	if total_notifs >= MAX_NOTIFS:
+		notification_label.text = ""
+		total_notifs = 0
 	notification_label.text += "\n>" + notification
+	total_notifs += 1
 
 
 func update_value(new_value, value_code):

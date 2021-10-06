@@ -26,7 +26,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Gravity" type="RichTextLabel" parent="Control/Values"]
+[node name="Position" type="RichTextLabel" parent="Control/Values"]
 margin_right = 372.0
 margin_bottom = 14.0
 theme = ExtResource( 2 )
@@ -36,7 +36,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Acceleration" type="RichTextLabel" parent="Control/Values"]
+[node name="Velocity" type="RichTextLabel" parent="Control/Values"]
 margin_top = 18.0
 margin_right = 372.0
 margin_bottom = 32.0
@@ -46,20 +46,10 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Rotation" type="RichTextLabel" parent="Control/Values"]
+[node name="Basis" type="RichTextLabel" parent="Control/Values"]
 margin_top = 36.0
 margin_right = 372.0
 margin_bottom = 50.0
-theme = ExtResource( 2 )
-fit_content_height = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Velocity" type="RichTextLabel" parent="Control/Values"]
-margin_top = 54.0
-margin_right = 372.0
-margin_bottom = 68.0
 theme = ExtResource( 2 )
 fit_content_height = true
 __meta__ = {
@@ -70,9 +60,9 @@ __meta__ = {
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 19.0
-margin_top = 620.0
+margin_top = 673.0
 margin_right = -498.0
-margin_bottom = 314.0
+margin_bottom = 367.0
 theme = ExtResource( 2 )
 scroll_following = true
 __meta__ = {

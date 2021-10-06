@@ -53,4 +53,6 @@ dependencies {
         exclude group: 'dnsjava'
         exclude group: 'commons-logging'
     }
+
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
 }

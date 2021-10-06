@@ -88,6 +88,8 @@ dependencies {
         exclude group: 'com.intellij'
     }
 
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+
 //CHUNK_DEPENDENCIES_BEGIN
 //CHUNK_DEPENDENCIES_END
 }

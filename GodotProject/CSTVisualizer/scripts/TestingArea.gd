@@ -2,22 +2,18 @@ extends Spatial
 
 
 const PIVOT_ROT_SPEED = 0.05
-const SPEED = 1
 
 
 var mind
 
-
-var device_quat = Quat()
-var device_acceleration = Vector3()
-var velocity = Vector3(0, 0, 0)
-var origin = null
 
 var left_pressed = false
 var right_pressed = false
 var x_pressed = false
 var y_pressed = false
 var z_pressed = false
+
+var total_calls = 0
 
 
 onready var phone = $Phone
@@ -32,29 +28,12 @@ func _ready():
 		
 		mind = Engine.get_singleton("VisualizerMind")
 		mind.connect("update_value", NotificationCenter, "update_value")
-		mind.connect("update_rotation", self, "update_rotation")
-		mind.connect("update_acceleration", self, "update_acceleration")
+		mind.connect("create_notification", NotificationCenter, "create_notification")
 		mind.start()
 		
 		NotificationCenter.create_notification("Mind started")
 	else:
 		NotificationCenter.create_notification("Unable to locate mind")
-
-
-func update_rotation(x, y, z, w):
-	device_quat = Quat(float(w), float(x), float(z), float(y))
-	NotificationCenter.update_value(str(device_quat), "ROTATION")
-	
-	if origin == null:
-		origin = device_quat.inverse()
-	
-	var t_aux = phone.translation
-	phone.transform = Transform(origin * device_quat)
-	phone.translation = t_aux
-
-
-func update_acceleration(x, y, z):
-	device_acceleration = Vector3(-float(x), -float(z), -float(y))
 
 
 func _physics_process(delta):
@@ -66,17 +45,21 @@ func _physics_process(delta):
 	
 	pivot.rotate_y(rotation_dir * PIVOT_ROT_SPEED)
 	
-	var dir = Vector3(0, 0, 0)
-	if x_pressed:
-		dir += Vector3(1, 0, 0)
-	if y_pressed:
-		dir += Vector3(0, 1, 0)
-	if z_pressed:
-		dir += Vector3(0, 0, 1)
-	
-	phone.translate(dir * SPEED * delta)
-	
-	projection.translation = Vector3(phone.transform.origin[0], 0, phone.transform.origin[2])
+	if mind != null:
+		var basis_string = mind.getBasis()
+		var basis = basis_string.rsplit(";")
+		var origin_string = mind.getWorldPosition()
+		var origin = origin_string.rsplit(";")
+		
+		if total_calls < 10:
+			NotificationCenter.create_notification("Basis: " + str(basis_string) + " - " + str(basis))
+			NotificationCenter.create_notification("Origin: " + str(origin_string) + " - " + str(origin))
+			total_calls += 1
+		
+		phone.transform.basis.z = Vector3(float(basis[0]), float(basis[1]), float(basis[2]))
+		phone.transform.basis.x = -Vector3(float(basis[3]), float(basis[4]), float(basis[5]))
+		phone.transform.basis.y = Vector3(float(basis[6]), float(basis[7]), float(basis[8]))
+		phone.transform.origin = Vector3(float(origin[0]), float(origin[2]), float(origin[1]))
 
 
 func left_pressed_down():
