@@ -54,7 +54,7 @@ material/0 = null
 [node name="CameraPivot" type="Spatial" parent="."]
 
 [node name="Camera" type="Camera" parent="CameraPivot"]
-transform = Transform( -4.34865e-08, -0.487982, 0.872854, -4.42794e-09, 0.872854, 0.487982, -1, 1.73557e-08, -4.01182e-08, 0.638462, 0.303139, 0 )
+transform = Transform( -4.34865e-08, -0.487982, 0.872854, -4.42794e-09, 0.872854, 0.487982, -1, 1.73557e-08, -4.01181e-08, 1.18972, 0.950163, 0 )
 
 [node name="Left" type="Button" parent="."]
 margin_left = 8.0
@@ -76,58 +76,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="X" type="Button" parent="."]
-visible = false
-margin_left = 9.0
-margin_top = 724.0
-margin_right = 130.0
-margin_bottom = 788.0
-text = "X"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Y" type="Button" parent="."]
-visible = false
-margin_left = 146.0
-margin_top = 724.0
-margin_right = 267.0
-margin_bottom = 788.0
-text = "Y"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Z" type="Button" parent="."]
-visible = false
-margin_left = 282.0
-margin_top = 724.0
-margin_right = 403.0
-margin_bottom = 788.0
-text = "Z"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Mean" type="Button" parent="."]
-visible = false
-margin_left = 8.66742
-margin_top = 662.0
-margin_right = 403.667
-margin_bottom = 713.0
-text = "GET MEAN"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [connection signal="button_down" from="Left" to="." method="left_pressed_down"]
 [connection signal="button_up" from="Left" to="." method="left_pressed_up"]
 [connection signal="button_down" from="Right" to="." method="right_pressed_down"]
 [connection signal="button_up" from="Right" to="." method="right_pressed_up"]
-[connection signal="button_down" from="X" to="." method="x_pressed_down"]
-[connection signal="button_up" from="X" to="." method="x_pressed_up"]
-[connection signal="button_down" from="Y" to="." method="y_pressed_down"]
-[connection signal="button_up" from="Y" to="." method="y_pressed_up"]
-[connection signal="button_down" from="Z" to="." method="z_pressed_down"]
-[connection signal="button_up" from="Z" to="." method="z_pressed_up"]
-[connection signal="pressed" from="Mean" to="." method="notify_mean"]

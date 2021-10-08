@@ -9,6 +9,12 @@ public class Vector3 {
     public float y;
     public float z;
 
+    public Vector3() {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
+
     public Vector3(float x, float y, float z) {
         df.setMaximumFractionDigits(2);
 
@@ -17,16 +23,40 @@ public class Vector3 {
         this.z = z;
     }
 
+    public Vector3 copy() {
+        /*
+            Returns a copy of this Vector3
+        */
+
+        return new Vector3(x, y, z);
+    }
+
     public Vector3 normalized() {
         /*
             Returns this Vector3 normalized
         */
 
-        float mod = (float) Math.pow(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2), 0.5);
+        float mod = (float) (Math.pow(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2), 0.5));
         if (mod == 0) {
             return new Vector3(0, 0 ,0);
         }
         return new Vector3(x/mod, y/mod, z/mod);
+    }
+
+    public float lenghtSquared() {
+        /*
+            Returns the squared lenght of this Vector3
+        */
+
+        return (float) (Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+    }
+
+    public float lenght() {
+        /*
+            Returns the lenght of this Vector3
+        */
+
+        return (float) Math.pow(lenghtSquared(), 0.5);
     }
 
     public Vector3 sub(Vector3 v) {
@@ -53,6 +83,22 @@ public class Vector3 {
         return new Vector3(x * a, y * a, z * a);
     }
 
+    public Vector3 project(Vector3 v) {
+        /*
+            Returns this Vector3 projected onto a Vector3 v
+        */
+
+        return v.multiply(dot(v)/v.lenghtSquared());
+    }
+
+    public Vector3 projectToPlane(Vector3 v) {
+        /*
+            Returns this Vector3 projected onto the plane normal to a Vector3 v
+        */
+
+        return sub(project(v));
+    }
+
     public float dot(Vector3 v) {
         /*
             Returns the dot product between this Vector3 and a Vector3 v
@@ -76,6 +122,10 @@ public class Vector3 {
 
         Vector3 u = new Vector3(x, y, z);
         return ((u.multiply(2.0f * dot(u))).add(multiply(w*w - u.dot(u)))).add((u.cross(this)).multiply(2.0f * w));
+    }
+
+    public boolean equals(Vector3 v) {
+        return (x == v.x && y == v.y && z == v.z);
     }
 
     @Override

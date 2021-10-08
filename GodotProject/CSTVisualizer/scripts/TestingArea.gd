@@ -2,6 +2,9 @@ extends Spatial
 
 
 const PIVOT_ROT_SPEED = 0.05
+const PIVOT_LERP_WEIGHT = 0.05
+
+const DEVICE_LERP_WEIGHT = 0.1
 
 
 var mind
@@ -9,12 +12,6 @@ var mind
 
 var left_pressed = false
 var right_pressed = false
-var x_pressed = false
-var y_pressed = false
-var z_pressed = false
-
-var total_calls = 0
-
 
 onready var phone = $Phone
 onready var pivot = $CameraPivot
@@ -29,7 +26,7 @@ func _ready():
 		mind = Engine.get_singleton("VisualizerMind")
 		mind.connect("update_value", NotificationCenter, "update_value")
 		mind.connect("create_notification", NotificationCenter, "create_notification")
-		mind.start()
+		mind.startRealTime()
 		
 		NotificationCenter.create_notification("Mind started")
 	else:
@@ -46,20 +43,22 @@ func _physics_process(delta):
 	pivot.rotate_y(rotation_dir * PIVOT_ROT_SPEED)
 	
 	if mind != null:
+		mind.update(delta)
+		
 		var basis_string = mind.getBasis()
 		var basis = basis_string.rsplit(";")
 		var origin_string = mind.getWorldPosition()
 		var origin = origin_string.rsplit(";")
 		
-		if total_calls < 10:
-			NotificationCenter.create_notification("Basis: " + str(basis_string) + " - " + str(basis))
-			NotificationCenter.create_notification("Origin: " + str(origin_string) + " - " + str(origin))
-			total_calls += 1
+		# From godot(g) to android(a) we have g.x = -a.y,  g.y = -a.z, g.z = -a.x
 		
-		phone.transform.basis.z = Vector3(float(basis[0]), float(basis[1]), float(basis[2]))
 		phone.transform.basis.x = -Vector3(float(basis[3]), float(basis[4]), float(basis[5]))
-		phone.transform.basis.y = Vector3(float(basis[6]), float(basis[7]), float(basis[8]))
-		phone.transform.origin = Vector3(float(origin[0]), float(origin[2]), float(origin[1]))
+		phone.transform.basis.y = -Vector3(float(basis[6]), float(basis[7]), float(basis[8]))
+		phone.transform.basis.z = -Vector3(float(basis[0]), float(basis[1]), float(basis[2]))
+		
+		phone.transform.origin = phone.transform.origin.linear_interpolate(-Vector3(float(origin[1]), float(origin[2]), float(origin[0])), DEVICE_LERP_WEIGHT)
+	
+	pivot.transform.origin = pivot.transform.origin.linear_interpolate(phone.transform.origin, PIVOT_LERP_WEIGHT)
 
 
 func left_pressed_down():
@@ -76,27 +75,3 @@ func right_pressed_down():
 
 func right_pressed_up():
 	right_pressed = false
-
-
-func x_pressed_down():
-	x_pressed = true
-
-
-func x_pressed_up():
-	x_pressed = false
-
-
-func y_pressed_down():
-	y_pressed = true
-
-
-func y_pressed_up():
-	y_pressed = false
-
-
-func z_pressed_down():
-	z_pressed = true
-
-
-func z_pressed_up():
-	z_pressed = false
