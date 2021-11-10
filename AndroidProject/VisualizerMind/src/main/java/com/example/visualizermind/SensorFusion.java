@@ -57,6 +57,19 @@ public class SensorFusion {
         lastLocationPos = new Vector3();
     }
 
+    private static Vector3 transformCanonicalToOur(Vector3 v) {
+        /*
+            Transforms v, in the device's canonical basis, into the basis we are using
+        */
+
+        return new Vector3(v.y, -v.x, v.z);
+    }
+
+    public void reset() {
+        deviceState = new DeviceState();
+        baseLocationPos = null;
+    }
+
     public void update(float deltaT) {
         /*
             Will run through the steps described above to update the values for the deviceState.
@@ -65,6 +78,14 @@ public class SensorFusion {
 
         RawDeviceState currentRawState = dataCollector.getData();
 
+        Vector3 localMagnetometer = currentRawState.IMUData.magnetomer;
+        Vector3 localAccelerometer = currentRawState.IMUData.accelerometer;
+        Vector3 localGyroscope = currentRawState.IMUData.gyroscope;
+
+        //Vector3 localMagnetometer = transformCanonicalToOur(currentRawState.IMUData.magnetomer);
+        //Vector3 localAccelerometer = transformCanonicalToOur(currentRawState.IMUData.accelerometer);
+        //Vector3 localGyroscope = transformCanonicalToOur(currentRawState.IMUData.gyroscope);
+
         /*
             STEP 1 - LOW PASS FILTER
         */
@@ -72,22 +93,23 @@ public class SensorFusion {
         float alpha = 0.8f;
 
         // Isolate the force of gravity with the low-pass filter.
-        gravity = new Vector3(alpha * gravity.x + (1 - alpha) * currentRawState.IMUData.accelerometer.x, alpha * gravity.y + (1 - alpha) * currentRawState.IMUData.accelerometer.y, alpha * gravity.z + (1 - alpha) * currentRawState.IMUData.accelerometer.z);
+        gravity = new Vector3(alpha * gravity.x + (1 - alpha) * localAccelerometer.x, alpha * gravity.y + (1 - alpha) * localAccelerometer.y, alpha * gravity.z + (1 - alpha) * localAccelerometer.z);
 
         // Remove the gravity contribution with the high-pass filter.
-        Vector3 linearAcceleration = new Vector3(currentRawState.IMUData.accelerometer.x - gravity.x, currentRawState.IMUData.accelerometer.y - gravity.y, currentRawState.IMUData.accelerometer.z - gravity.z);
+        Vector3 linearAcceleration = new Vector3(localAccelerometer.x - gravity.x, localAccelerometer.y - gravity.y, localAccelerometer.z - gravity.z);
 
         /*
             STEP 2 - ORIENTATION CALCULATED THROUGH GRAVITY AND MAGNETOMETER
 
-            Uses the method described in https://youtu.be/0rlvvYgmTvI?t=160
+            Uses a similar method to the one described in https://youtu.be/0rlvvYgmTvI?t=160 but we
+            use up as the positive orientation for y
         */
 
-        Vector3 magnetometerGravityOrientationZ = (gravity.multiply(-1)).normalized();
-        Vector3 magnetometerGravityOrientationX = (magnetometerGravityOrientationZ.cross(currentRawState.IMUData.magnetomer)).normalized();
-        Vector3 magnetometerGravityOrientationY = (magnetometerGravityOrientationX.cross(magnetometerGravityOrientationZ)).normalized();
+        Vector3 magnetometerGravityOrientationY = (gravity).normalized();
+        Vector3 magnetometerGravityOrientationX = (magnetometerGravityOrientationY.cross(localMagnetometer)).normalized();
+        Vector3 magnetometerGravityOrientationZ = (magnetometerGravityOrientationX.cross(magnetometerGravityOrientationY)).normalized();
 
-        Basis magnetometerGravityBasis = new Basis(magnetometerGravityOrientationX, magnetometerGravityOrientationY, magnetometerGravityOrientationZ);
+        Basis magnetometerGravityBasis = (new Basis(magnetometerGravityOrientationX, magnetometerGravityOrientationY, magnetometerGravityOrientationZ)).inverted();
 
         /*
             STEP 3 - ORIENTATION CALCULATED THROUGH GYROSCOPE
@@ -99,6 +121,9 @@ public class SensorFusion {
 
         Basis gyroscopeOrientation = deviceState.basis.rotateQuat(currentRawState.IMUData.gyroscope.x * deltaT * 0.5f, currentRawState.IMUData.gyroscope.x * deltaT * 0.5f, currentRawState.IMUData.gyroscope.x * deltaT * 0.5f, 1);
         gyroscopeOrientation = gyroscopeOrientation.orthonormalized();
+
+        // TEMP
+        gyroscopeOrientation = magnetometerGravityBasis;
 
         /*
             STEP 4 - FUSION OF ORIENTATION DATA
@@ -133,10 +158,14 @@ public class SensorFusion {
         /*
             STEP 5 - POSITION AND VELOCITY CALCULATED THROUGH ORIENTATION AND LINEAR ACCELERATION
         */
+        Vector3 globalAcceleration = orientation.fromFrameToGlobal(linearAcceleration);
 
-        Vector3 deltaPos = orientation.vectorToFrameOfReference(linearAcceleration.multiply((float) (Math.pow(deltaT, 2)/2)));
+        Vector3 deltaPos = globalAcceleration.multiply((float) (Math.pow(deltaT, 2)/2));
         Vector3 linearAccelerationPosition = (deviceState.position.add(deviceState.velocity.multiply(deltaT))).add(deltaPos);
-        Vector3 linearAccelerationVelocity = deviceState.velocity.add(linearAcceleration.multiply(deltaT));
+
+        Vector3 linearAccelerationVelocity = deviceState.velocity.add(globalAcceleration.multiply(deltaT));
+
+        VisualizerMind.getInstance().updateValue(orientation.fromFrameToGlobal(globalAcceleration).toString(), "ACCELERATION");
 
         /*
             STEP 6 - POSITION AND VELOCITY CALCULATED THROUGH FUSED LOCATION
@@ -188,6 +217,12 @@ public class SensorFusion {
             UPDATE DEVICE STATE
         */
 
+        VisualizerMind.getInstance().updateValue(currentRawState.IMUData.magnetomer.toString(), "M");
+
+        //Vector3 c = orientation.v_x;
+        //orientation.v_x = orientation.v_y.multiply(-1);
+        //orientation.v_y = c;
+
         deviceState.position = position;
         deviceState.velocity = velocity;
         deviceState.basis = orientation;
@@ -216,7 +251,7 @@ public class SensorFusion {
             Returns a Vector3 that represents an absolute position from latitude and longitude
         */
 
-        return new Vector3((float) location.getLatitude() * DISTANCE_PER_DEGREE, (float) location.getLongitude() * DISTANCE_PER_DEGREE, (float) -location.getAltitude());
+        return new Vector3((float) -location.getLongitude() * DISTANCE_PER_DEGREE, (float) location.getAltitude(), (float) location.getLatitude() * DISTANCE_PER_DEGREE);
     }
 
     /*

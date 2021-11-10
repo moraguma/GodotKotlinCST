@@ -43,7 +43,7 @@ public class VisualizerMind extends GodotPlugin {
     @NonNull
     @Override
     public List<String> getPluginMethods() {
-        return Arrays.asList("startRealTime", "update", "getBasis", "getWorldPosition");
+        return Arrays.asList("startRealTime", "update", "getBasis", "getWorldPosition", "resetPosition");
     }
 
     @NonNull
@@ -63,6 +63,10 @@ public class VisualizerMind extends GodotPlugin {
         */
 
         sensorFusion = new SensorFusion(new RealTimeDataCollector());
+    }
+
+    public void resetPosition() {
+        sensorFusion.reset();
     }
 
     public void update(float deltaT) {
@@ -95,5 +99,9 @@ public class VisualizerMind extends GodotPlugin {
 
     public void createNotification(String notif) {
         emitSignal("create_notification", notif);
+    }
+
+    public void updateValue(String value, String code) {
+        emitSignal("update_value", value, code);
     }
 }

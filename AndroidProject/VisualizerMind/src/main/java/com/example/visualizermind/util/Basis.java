@@ -1,5 +1,7 @@
 package com.example.visualizermind.util;
 
+import java.util.Vector;
+
 public class Basis {
     public Vector3 v_x;
     public Vector3 v_y;
@@ -43,6 +45,42 @@ public class Basis {
         return new Basis(new_v_x, new_v_y, new_v_z);
     }
 
+    private Vector3 solve3VarLinearEquation(float w1, float w2, float w3, float c1, float c2, float c3, float c4, float c5, float c6, float c7, float c8, float c9) {
+        /*
+            Returns X given W and C
+
+             W = CX
+             w1     c1 c2 c3   x
+             w2  =  c4 c5 c6   y
+             w3     c7 c8 c9   z
+
+             Returns (0, 0, 0) if the system doesn't have a unique solution
+        */
+
+        float D = c1*c5*c9 + c2*c6*c7 + c3*c4*c8 - c3*c5*c7 - c2*c4*c9 - c1*c6*c8;
+
+        if (D == 0) {
+            return new Vector3();
+        }
+
+        float x = (w1*c5*c9 + c2*c6*w3 + c3*w2*c8 - c3*c5*w3 - c2*w2*c9 - w1*c6*c8)/D;
+        float y = (c1*w2*c9 + w1*c6*c7 + c3*c4*w3 - c3*w2*c7 - w1*c4*c9 - c1*c6*w3)/D;
+        float z = (c1*c5*w3 + c2*w2*c7 + w1*c4*c8 - w1*c5*c7 - c2*c4*w3 - c1*w2*c8)/D;
+
+        return new Vector3(x, y, z);
+    }
+
+    public Vector3 fromFrameToGlobal(Vector3 w) {
+        /*
+            Given that w is expressed in this basis, returns w expressed in this basis's frame of
+            reference. Effectively,
+
+            w_g = w_1 * v_x + w_2 * v_y + w_3 * v_z
+        */
+
+        return ((v_x.multiply(w.x)).add(v_y.multiply(w.y))).add(v_z.multiply(w.z));
+    }
+
     public Vector3 vectorToFrameOfReference(Vector3 w) {
         /*
             Given that this basis is represented in w's frame of reference, returns w
@@ -79,6 +117,23 @@ public class Basis {
         new_v_x = new_v_x.normalized();
         new_v_y = new_v_y.normalized();
         new_v_z = new_v_z.normalized();
+
+        return new Basis(new_v_x, new_v_y, new_v_z);
+    }
+
+    public Basis inverted() {
+        /*
+            Assuming this is the canonical basis represented in a specific basis, returns the
+            specific basis represented in the canonical basis
+        */
+
+        Vector3 sol_x = solve3VarLinearEquation(1, 0, 0, v_x.x, v_x.y, v_x.z, v_y.x, v_y.y, v_y.z, v_z.x, v_z.y, v_z.z);
+        Vector3 sol_y = solve3VarLinearEquation(0, 1, 0, v_x.x, v_x.y, v_x.z, v_y.x, v_y.y, v_y.z, v_z.x, v_z.y, v_z.z);
+        Vector3 sol_z = solve3VarLinearEquation(0, 0, 1, v_x.x, v_x.y, v_x.z, v_y.x, v_y.y, v_y.z, v_z.x, v_z.y, v_z.z);
+
+        Vector3 new_v_x = new Vector3(sol_x.x, sol_y.x, sol_z.x);
+        Vector3 new_v_y = new Vector3(sol_x.y, sol_y.y, sol_z.y);
+        Vector3 new_v_z = new Vector3(sol_x.z, sol_y.z, sol_z.z);
 
         return new Basis(new_v_x, new_v_y, new_v_z);
     }

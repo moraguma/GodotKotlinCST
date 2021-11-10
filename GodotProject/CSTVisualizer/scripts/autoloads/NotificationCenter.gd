@@ -5,7 +5,7 @@ const MAX_NOTIFS = 100
 
 var total_notifs = 0
 
-onready var VALUES = {"POSITION": $Control/Values/Position, "VELOCITY": $Control/Values/Velocity, "BASIS": $Control/Values/Basis}
+onready var VALUES = {"POSITION": $Control/Values/Position, "VELOCITY": $Control/Values/Velocity, "BASIS": $Control/Values/Basis, "ACCELERATION": $Control/Values/Acceleration}
 onready var notification_label = $Control/Notification
 
 func create_notification(notification):

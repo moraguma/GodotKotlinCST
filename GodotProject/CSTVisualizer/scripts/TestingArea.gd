@@ -17,6 +17,9 @@ onready var phone = $Phone
 onready var pivot = $CameraPivot
 onready var projection = $Projection
 
+onready var fixed_camera = $FixedCamera
+onready var tracking_camera = $CameraPivot/TrackingCamera
+
 
 func _ready():
 	NotificationCenter.create_notification("Started")
@@ -52,11 +55,11 @@ func _physics_process(delta):
 		
 		# From godot(g) to android(a) we have g.x = -a.y,  g.y = -a.z, g.z = -a.x
 		
-		phone.transform.basis.x = -Vector3(float(basis[3]), float(basis[4]), float(basis[5]))
-		phone.transform.basis.y = -Vector3(float(basis[6]), float(basis[7]), float(basis[8]))
-		phone.transform.basis.z = -Vector3(float(basis[0]), float(basis[1]), float(basis[2]))
+		phone.transform.basis.x = Vector3(float(basis[0]), float(basis[1]), float(basis[2]))
+		phone.transform.basis.y = Vector3(float(basis[3]), float(basis[4]), float(basis[5]))
+		phone.transform.basis.z = Vector3(float(basis[6]), float(basis[7]), float(basis[8]))
 		
-		phone.transform.origin = phone.transform.origin.linear_interpolate(-Vector3(float(origin[1]), float(origin[2]), float(origin[0])), DEVICE_LERP_WEIGHT)
+		phone.transform.origin = phone.transform.origin.linear_interpolate(Vector3(float(origin[0]), float(origin[1]), float(origin[2])), DEVICE_LERP_WEIGHT)
 	
 	pivot.transform.origin = pivot.transform.origin.linear_interpolate(phone.transform.origin, PIVOT_LERP_WEIGHT)
 
@@ -75,3 +78,18 @@ func right_pressed_down():
 
 func right_pressed_up():
 	right_pressed = false
+
+
+func reset_pos():
+	if mind != null:
+		mind.resetPosition()
+
+
+func use_fixed_camera():
+	tracking_camera.current = false
+	fixed_camera.current = true
+
+
+func use_tracking_camera():
+	fixed_camera.current = false
+	tracking_camera.current = true
